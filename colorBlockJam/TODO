@@ -1,0 +1,15 @@
+Fase 1
+    leer archivo
+    representar tablero
+
+Fase 2
+    mover bloques
+
+Fase 3
+    crear State
+
+Fase 4
+    implementar Heap
+
+Fase 5
+    A*
