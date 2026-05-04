@@ -13,3 +13,47 @@ Fase 4
 
 Fase 5
     A*
+
+
+Falta 
+Clases que necesitas implementar
+Pensando en el diseño orientado a objetos, estas son las clases principales:
+Estructuras de datos (sin STL):
+
+Queue / PriorityQueue — para el OpenSet del A* (heap binario)
+HashSet o HashTable — para el ClosedSet (detectar estados visitados)
+
+Dominio del juego:
+
+Block — representa un bloque con su geometría, color, posición
+Exit — salida del tablero (con largo variable)
+Gate — compuerta (con color que cambia)
+Board — el tablero completo (H×W, paredes, bloques, salidas, compuertas)
+GameState — estado completo del juego en un instante (necesario para A*)
+ConfigReader — parsea el archivo .txt de configuración
+
+Algoritmo:
+
+AStar — el algoritmo en sí, usa PriorityQueue + HashSet
+
+Principal:
+
+main.cpp — menú interactivo
+
+/
+├── Makefile
+├── main.cpp
+├── src/
+│   ├── Block.h / Block.cpp
+│   ├── Board.h / Board.cpp
+│   ├── GameState.h / GameState.cpp
+│   ├── Exit.h / Exit.cpp
+│   ├── Gate.h / Gate.cpp
+│   ├── PriorityQueue.h / PriorityQueue.cpp
+│   ├── HashSet.h / HashSet.cpp
+│   ├── ConfigReader.h / ConfigReader.cpp
+│   └── AStar.h / AStar.cpp
+└── tests/
+    ├── test_Block.cpp
+    ├── test_Board.cpp
+    └── ...
