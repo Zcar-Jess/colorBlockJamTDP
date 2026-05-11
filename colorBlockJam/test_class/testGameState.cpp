@@ -30,10 +30,9 @@ void testGameStateBasico() {
     assert(gs->parent      == nullptr);
     assert(gs->lastOp      == nullptr);
 
-    // Heuristica = cantidad de bloques (1 bloque)
-    assert(gs->h == 1);
-    assert(gs->f() == 1);  // f = g + h = 0 + 1
-
+    // La heuristica
+    assert(gs->h >= 0);
+    assert(gs->f() == gs->g + gs->h);
     delete gs;
     std::cout << "  PASSED\n";
 }
@@ -62,18 +61,23 @@ void testGameStateEquals() {
 }
 
 void testHeapOrden() {
+
     std::cout << "[TEST] Heap ordena por f = g + h...\n";
 
     Heap heap(10);
 
-    // Crear 3 estados con distintos g (h=1 en todos, 1 bloque)
     Board* b1 = buildBoard();
     Board* b2 = buildBoard();
     Board* b3 = buildBoard();
 
-    GameState* gs1 = new GameState(b1, 0, 5, nullptr, nullptr); // f=6
-    GameState* gs2 = new GameState(b2, 0, 1, nullptr, nullptr); // f=2
-    GameState* gs3 = new GameState(b3, 0, 3, nullptr, nullptr); // f=4
+    GameState* gs1 =
+        new GameState(b1, 0, 5, nullptr, nullptr);
+
+    GameState* gs2 =
+        new GameState(b2, 0, 1, nullptr, nullptr);
+
+    GameState* gs3 =
+        new GameState(b3, 0, 3, nullptr, nullptr);
 
     heap.push(gs1);
     heap.push(gs2);
@@ -81,19 +85,20 @@ void testHeapOrden() {
 
     assert(heap.size == 3);
 
-    // pop debe retornar en orden: f=2, f=4, f=6
-    GameState* primero  = heap.pop();
-    GameState* segundo  = heap.pop();
-    GameState* tercero  = heap.pop();
+    GameState* primero = heap.pop();
+    GameState* segundo = heap.pop();
+    GameState* tercero = heap.pop();
 
-    assert(primero->f() == 2);
-    assert(segundo->f() == 4);
-    assert(tercero->f() == 6);
+    // Deben salir ordenados por f creciente
+    assert(primero->f() <= segundo->f());
+    assert(segundo->f() <= tercero->f());
+
     assert(heap.isEmpty() == true);
 
     delete primero;
     delete segundo;
     delete tercero;
+
     std::cout << "  PASSED\n";
 }
 

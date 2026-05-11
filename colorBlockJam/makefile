@@ -1,145 +1,243 @@
-CXX      = g++
-CXXFLAGS = -Wall -Wextra -std=c++17 -g -I include/
+CXX       = g++
+CXXFLAGS  = -Wall -Wextra -std=c++17 -g -I include/
 BUILD_DIR = build
 
-# -------------------------------------------------------
-# Grupos de objetos base (compartidos entre tests)
-# -------------------------------------------------------
-OBJS_BASE  = $(BUILD_DIR)/Block.o $(BUILD_DIR)/Exit.o $(BUILD_DIR)/Gate.o \
-             $(BUILD_DIR)/Cell.o  $(BUILD_DIR)/Board.o
-OBJS_MOVES = $(BUILD_DIR)/Operation.o $(BUILD_DIR)/MoveUp.o \
-             $(BUILD_DIR)/MoveDown.o  $(BUILD_DIR)/MoveLeft.o \
-             $(BUILD_DIR)/MoveRight.o
+# =======================================================
+# OBJETOS BASE
+# =======================================================
 
-# -------------------------------------------------------
-# Targets de test
-# -------------------------------------------------------
-TEST_BLOCK     = $(BUILD_DIR)/testBlock
-TEST_EXIT      = $(BUILD_DIR)/testExit
-TEST_GATE      = $(BUILD_DIR)/testGate
-TEST_CELL      = $(BUILD_DIR)/testCell
-TEST_BOARD     = $(BUILD_DIR)/testBoard
-TEST_OPERATION = $(BUILD_DIR)/testOperation
-TEST_GAMESTATE     = $(BUILD_DIR)/testGameState
+OBJS_BASE = \
+	$(BUILD_DIR)/Block.o \
+	$(BUILD_DIR)/Exit.o \
+	$(BUILD_DIR)/Gate.o \
+	$(BUILD_DIR)/Cell.o \
+	$(BUILD_DIR)/Board.o
 
-# -------------------------------------------------------
-# Objetos fuente
-# -------------------------------------------------------
-OBJ_BLOCK     = $(BUILD_DIR)/Block.o
-OBJ_EXIT      = $(BUILD_DIR)/Exit.o
-OBJ_GATE      = $(BUILD_DIR)/Gate.o
-OBJ_CELL      = $(BUILD_DIR)/Cell.o
-OBJ_BOARD     = $(BUILD_DIR)/Board.o
-OBJ_OPERATION = $(BUILD_DIR)/Operation.o
-OBJ_MOVEUP    = $(BUILD_DIR)/MoveUp.o
-OBJ_MOVEDOWN  = $(BUILD_DIR)/MoveDown.o
-OBJ_MOVELEFT  = $(BUILD_DIR)/MoveLeft.o
-OBJ_MOVERIGHT = $(BUILD_DIR)/MoveRight.o
-OBJ_GAMESTATE      = $(BUILD_DIR)/GameState.o
-OBJ_HEAP           = $(BUILD_DIR)/Heap.o
+# =======================================================
+# PARSER
+# =======================================================
 
-# -------------------------------------------------------
-# Objetos de test
-# -------------------------------------------------------
-OBJ_TEST_BLOCK = $(BUILD_DIR)/testBlock.o
-OBJ_TEST_EXIT  = $(BUILD_DIR)/testExit.o
-OBJ_TEST_GATE  = $(BUILD_DIR)/testGate.o
-OBJ_TEST_CELL  = $(BUILD_DIR)/testCell.o
-OBJ_TEST_BOARD = $(BUILD_DIR)/testBoard.o
-OBJ_TEST_OP    = $(BUILD_DIR)/testOperation.o
-OBJ_TEST_GAMESTATE = $(BUILD_DIR)/testGameState.o
+OBJS_PARSER = \
+	$(BUILD_DIR)/BoardParser.o
 
-# -------------------------------------------------------
-# Default: compila todos los tests
-# -------------------------------------------------------
-all: $(TEST_BLOCK) $(TEST_EXIT) $(TEST_GATE) $(TEST_CELL) \
-     $(TEST_BOARD) $(TEST_OPERATION) $(TEST_GAMESTATE)
+# =======================================================
+# MOVIMIENTOS
+# =======================================================
 
-# -------------------------------------------------------
-# Crear carpeta build si no existe
-# -------------------------------------------------------
+OBJS_MOVES = \
+	$(BUILD_DIR)/Operation.o \
+	$(BUILD_DIR)/MoveUp.o \
+	$(BUILD_DIR)/MoveDown.o \
+	$(BUILD_DIR)/MoveLeft.o \
+	$(BUILD_DIR)/MoveRight.o
+
+# =======================================================
+# A*
+# =======================================================
+
+OBJS_ASTAR = \
+	$(BUILD_DIR)/GameState.o \
+	$(BUILD_DIR)/Heap.o \
+	$(BUILD_DIR)/ClosedSet.o \
+	$(BUILD_DIR)/NeighborGenerator.o \
+	$(BUILD_DIR)/Solver.o
+
+# =======================================================
+# EJECUTABLES TEST
+# =======================================================
+
+TEST_BLOCK        = $(BUILD_DIR)/testBlock
+TEST_EXIT         = $(BUILD_DIR)/testExit
+TEST_GATE         = $(BUILD_DIR)/testGate
+TEST_CELL         = $(BUILD_DIR)/testCell
+TEST_BOARD        = $(BUILD_DIR)/testBoard
+TEST_OPERATION    = $(BUILD_DIR)/testOperation
+TEST_GAMESTATE    = $(BUILD_DIR)/testGameState
+TEST_SOLVER       = $(BUILD_DIR)/testSolver
+TEST_BOARDPARSER  = $(BUILD_DIR)/testBoardParser
+
+# =======================================================
+# OBJETOS TEST
+# =======================================================
+
+OBJ_TEST_BLOCK        = $(BUILD_DIR)/testBlock.o
+OBJ_TEST_EXIT         = $(BUILD_DIR)/testExit.o
+OBJ_TEST_GATE         = $(BUILD_DIR)/testGate.o
+OBJ_TEST_CELL         = $(BUILD_DIR)/testCell.o
+OBJ_TEST_BOARD        = $(BUILD_DIR)/testBoard.o
+OBJ_TEST_OP           = $(BUILD_DIR)/testOperation.o
+OBJ_TEST_GAMESTATE    = $(BUILD_DIR)/testGameState.o
+OBJ_TEST_SOLVER       = $(BUILD_DIR)/testSolver.o
+OBJ_TEST_BOARDPARSER  = $(BUILD_DIR)/testBoardParser.o
+
+# =======================================================
+# TARGET DEFAULT
+# =======================================================
+
+all: \
+	$(TEST_BLOCK) \
+	$(TEST_EXIT) \
+	$(TEST_GATE) \
+	$(TEST_CELL) \
+	$(TEST_BOARD) \
+	$(TEST_OPERATION) \
+	$(TEST_GAMESTATE) \
+	$(TEST_SOLVER) \
+	$(TEST_BOARDPARSER)
+
+# =======================================================
+# CREAR BUILD DIR
+# =======================================================
+
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-# -------------------------------------------------------
-# Compilacion de objetos fuente
-# -------------------------------------------------------
-$(OBJ_BLOCK): src/Block.cpp include/Block.h | $(BUILD_DIR)
+# =======================================================
+# BASE
+# =======================================================
+
+$(BUILD_DIR)/Block.o: src/Block.cpp include/Block.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_EXIT): src/Exit.cpp include/Exit.h | $(BUILD_DIR)
+$(BUILD_DIR)/Exit.o: src/Exit.cpp include/Exit.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_GATE): src/Gate.cpp include/Gate.h | $(BUILD_DIR)
+$(BUILD_DIR)/Gate.o: src/Gate.cpp include/Gate.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_CELL): src/Cell.cpp include/Cell.h | $(BUILD_DIR)
+$(BUILD_DIR)/Cell.o: src/Cell.cpp include/Cell.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_BOARD): src/Board.cpp include/Board.h include/Cell.h \
-              include/Block.h include/Exit.h include/Gate.h | $(BUILD_DIR)
+$(BUILD_DIR)/Board.o: src/Board.cpp \
+	include/Board.h \
+	include/Cell.h \
+	include/Block.h \
+	include/Exit.h \
+	include/Gate.h | $(BUILD_DIR)
+
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_OPERATION): src/Operation.cpp include/Operation.h | $(BUILD_DIR)
+# =======================================================
+# PARSER
+# =======================================================
+
+$(BUILD_DIR)/BoardParser.o: src/BoardParser.cpp \
+	include/BoardParser.h \
+	include/Board.h | $(BUILD_DIR)
+
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_MOVEUP): src/MoveUp.cpp include/MoveUp.h | $(BUILD_DIR)
+# =======================================================
+# MOVIMIENTOS
+# =======================================================
+
+$(BUILD_DIR)/Operation.o: src/Operation.cpp include/Operation.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_MOVEDOWN): src/MoveDown.cpp include/MoveDown.h | $(BUILD_DIR)
+$(BUILD_DIR)/MoveUp.o: src/MoveUp.cpp include/MoveUp.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_MOVELEFT): src/MoveLeft.cpp include/MoveLeft.h | $(BUILD_DIR)
+$(BUILD_DIR)/MoveDown.o: src/MoveDown.cpp include/MoveDown.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_MOVERIGHT): src/MoveRight.cpp include/MoveRight.h | $(BUILD_DIR)
+$(BUILD_DIR)/MoveLeft.o: src/MoveLeft.cpp include/MoveLeft.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_GAMESTATE): src/GameState.cpp include/GameState.h include/Board.h include/Operation.h | $(BUILD_DIR)
+$(BUILD_DIR)/MoveRight.o: src/MoveRight.cpp include/MoveRight.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_HEAP): src/Heap.cpp include/Heap.h include/GameState.h | $(BUILD_DIR)
+# =======================================================
+# A*
+# =======================================================
+
+$(BUILD_DIR)/GameState.o: src/GameState.cpp \
+	include/GameState.h \
+	include/Board.h \
+	include/Operation.h | $(BUILD_DIR)
+
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# -------------------------------------------------------
-# Compilacion de objetos de test
-# -------------------------------------------------------
-$(OBJ_TEST_BLOCK): test_class/testBlock.cpp include/Block.h | $(BUILD_DIR)
+$(BUILD_DIR)/Heap.o: src/Heap.cpp \
+	include/Heap.h \
+	include/GameState.h | $(BUILD_DIR)
+
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_TEST_EXIT): test_class/testExit.cpp include/Exit.h | $(BUILD_DIR)
+$(BUILD_DIR)/ClosedSet.o: src/ClosedSet.cpp \
+	include/ClosedSet.h \
+	include/GameState.h | $(BUILD_DIR)
+
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_TEST_GATE): test_class/testGate.cpp include/Gate.h | $(BUILD_DIR)
+$(BUILD_DIR)/NeighborGenerator.o: src/NeighborGenerator.cpp \
+	include/NeighborGenerator.h \
+	include/GameState.h \
+	include/MoveUp.h \
+	include/MoveDown.h \
+	include/MoveLeft.h \
+	include/MoveRight.h | $(BUILD_DIR)
+
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_TEST_CELL): test_class/testCell.cpp include/Cell.h | $(BUILD_DIR)
+$(BUILD_DIR)/Solver.o: src/Solver.cpp \
+	include/Solver.h \
+	include/Heap.h \
+	include/ClosedSet.h \
+	include/NeighborGenerator.h | $(BUILD_DIR)
+
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_TEST_BOARD): test_class/testBoard.cpp include/Board.h | $(BUILD_DIR)
+# =======================================================
+# TESTS
+# =======================================================
+
+$(BUILD_DIR)/testBlock.o: test_class/testBlock.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_TEST_OP): test_class/testOperation.cpp include/Board.h \
-                include/MoveUp.h include/MoveDown.h \
-                include/MoveLeft.h include/MoveRight.h | $(BUILD_DIR)
+$(BUILD_DIR)/testExit.o: test_class/testExit.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(OBJ_TEST_GAMESTATE): test_class/testGameState.cpp include/GameState.h include/Heap.h | $(BUILD_DIR)
+$(BUILD_DIR)/testGate.o: test_class/testGate.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# -------------------------------------------------------
-# Linkeo de ejecutables de test
-# -------------------------------------------------------
-$(TEST_BLOCK): $(OBJ_TEST_BLOCK) $(OBJ_BLOCK)
+$(BUILD_DIR)/testCell.o: test_class/testCell.cpp | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/testBoard.o: test_class/testBoard.cpp | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/testOperation.o: test_class/testOperation.cpp | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/testGameState.o: test_class/testGameState.cpp | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/testSolver.o: test_class/testSolver.cpp | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# =======================================================
+# TEST PARSER
+# =======================================================
+
+$(BUILD_DIR)/testBoardParser.o: \
+	test_class/testBoardParser.cpp | $(BUILD_DIR)
+
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# =======================================================
+# LINKEO
+# =======================================================
+
+$(TEST_BLOCK): $(OBJ_TEST_BLOCK) $(BUILD_DIR)/Block.o
 	$(CXX) $^ -o $@
 
-$(TEST_EXIT): $(OBJ_TEST_EXIT) $(OBJ_EXIT)
+$(TEST_EXIT): $(OBJ_TEST_EXIT) $(BUILD_DIR)/Exit.o
 	$(CXX) $^ -o $@
 
-$(TEST_GATE): $(OBJ_TEST_GATE) $(OBJ_GATE)
+$(TEST_GATE): $(OBJ_TEST_GATE) $(BUILD_DIR)/Gate.o
 	$(CXX) $^ -o $@
 
-$(TEST_CELL): $(OBJ_TEST_CELL) $(OBJ_CELL)
+$(TEST_CELL): $(OBJ_TEST_CELL) $(BUILD_DIR)/Cell.o
 	$(CXX) $^ -o $@
 
 $(TEST_BOARD): $(OBJ_TEST_BOARD) $(OBJS_BASE)
@@ -148,13 +246,40 @@ $(TEST_BOARD): $(OBJ_TEST_BOARD) $(OBJS_BASE)
 $(TEST_OPERATION): $(OBJ_TEST_OP) $(OBJS_MOVES) $(OBJS_BASE)
 	$(CXX) $^ -o $@
 
-$(TEST_GAMESTATE): $(OBJ_TEST_GAMESTATE) $(OBJ_GAMESTATE) $(OBJ_HEAP) \
-                   $(OBJS_MOVES) $(OBJS_BASE)
+$(TEST_GAMESTATE): \
+	$(OBJ_TEST_GAMESTATE) \
+	$(BUILD_DIR)/GameState.o \
+	$(BUILD_DIR)/Heap.o \
+	$(OBJS_MOVES) \
+	$(OBJS_BASE)
+
 	$(CXX) $^ -o $@
 
-# -------------------------------------------------------
-# Correr tests individuales
-# -------------------------------------------------------
+$(TEST_SOLVER): \
+	$(OBJ_TEST_SOLVER) \
+	$(OBJS_ASTAR) \
+	$(OBJS_MOVES) \
+	$(OBJS_BASE)
+
+	$(CXX) $^ -o $@
+
+# =======================================================
+# TEST BOARD PARSER
+# =======================================================
+
+$(TEST_BOARDPARSER): \
+	$(OBJ_TEST_BOARDPARSER) \
+	$(OBJS_PARSER) \
+	$(OBJS_ASTAR) \
+	$(OBJS_MOVES) \
+	$(OBJS_BASE)
+
+	$(CXX) $^ -o $@
+
+# =======================================================
+# RUN INDIVIDUALES
+# =======================================================
+
 testBlock: $(TEST_BLOCK)
 	./$(TEST_BLOCK)
 
@@ -176,38 +301,55 @@ testOperation: $(TEST_OPERATION)
 testGameState: $(TEST_GAMESTATE)
 	./$(TEST_GAMESTATE)
 
-# -------------------------------------------------------
-# Correr todos los tests
-# -------------------------------------------------------
+testSolver: $(TEST_SOLVER)
+	./$(TEST_SOLVER)
+
+testBoardParser: $(TEST_BOARDPARSER)
+	./$(TEST_BOARDPARSER)
+
+# =======================================================
+# RUN ALL
+# =======================================================
+
 run: all
-	@echo "\n=== Corriendo testBlock ==="
+
+	@echo "\n=== testBlock ==="
 	./$(TEST_BLOCK)
-	@echo "\n=== Corriendo testExit ==="
+
+	@echo "\n=== testExit ==="
 	./$(TEST_EXIT)
-	@echo "\n=== Corriendo testGate ==="
+
+	@echo "\n=== testGate ==="
 	./$(TEST_GATE)
-	@echo "\n=== Corriendo testCell ==="
+
+	@echo "\n=== testCell ==="
 	./$(TEST_CELL)
-	@echo "\n=== Corriendo testBoard ==="
+
+	@echo "\n=== testBoard ==="
 	./$(TEST_BOARD)
-	@echo "\n=== Corriendo testOperation ==="
+
+	@echo "\n=== testOperation ==="
 	./$(TEST_OPERATION)
-	@echo "\n=== Corriendo testGameState ==="
+
+	@echo "\n=== testGameState ==="
 	./$(TEST_GAMESTATE)
 
-# -------------------------------------------------------
-# Valgrind (detectar memory leaks)
-# -------------------------------------------------------
-valgrind: all
-	valgrind --leak-check=full ./$(TEST_BLOCK)
-	valgrind --leak-check=full ./$(TEST_EXIT)
-	valgrind --leak-check=full ./$(TEST_GATE)
-	valgrind --leak-check=full ./$(TEST_CELL)
-	valgrind --leak-check=full ./$(TEST_BOARD)
-	valgrind --leak-check=full ./$(TEST_OPERATION)
+	@echo "\n=== testSolver ==="
+	./$(TEST_SOLVER)
 
-# -------------------------------------------------------
-# Limpiar build
-# -------------------------------------------------------
+	@echo "\n=== testBoardParser ==="
+	./$(TEST_BOARDPARSER)
+
+# =======================================================
+# VALGRIND
+# =======================================================
+
+valgrind: $(TEST_BOARDPARSER)
+	valgrind --leak-check=full ./$(TEST_BOARDPARSER)
+
+# =======================================================
+# CLEAN
+# =======================================================
+
 clean:
 	rm -rf $(BUILD_DIR)

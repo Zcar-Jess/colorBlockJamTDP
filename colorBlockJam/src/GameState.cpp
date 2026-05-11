@@ -32,7 +32,48 @@ int GameState::f() const {
 // Heuristica mas sofisticada (mejora futura): sumar la distancia
 // Manhattan de cada bloque a su salida mas cercana del mismo color.
 int GameState::computeHeuristic() const {
-    return board->numBlocks;
+    int total = 0;
+
+    for (int i = 0; i < board->numBlocks; i++) {
+
+        Block* blk = board->blocks[i];
+
+        int bestDist = 999999;
+
+        for (int j = 0; j < board->numExits; j++) {
+
+            Exit& ex = board->exits[j];
+
+            // solo salidas del mismo color
+            if (ex.color != blk->color) {
+                continue;
+            }
+
+            int dist = 0;
+
+            // distancia Manhattan desde esquina superior izquierda
+            dist += (blk->x > ex.y)
+                    ? (blk->x - ex.y)
+                    : (ex.y - blk->x);
+
+            dist += (blk->y > ex.x)
+                    ? (blk->y - ex.x)
+                    : (ex.x - blk->y);
+
+            if (dist < bestDist) {
+                bestDist = dist;
+            }
+        }
+
+        // si no existe salida compatible
+        if (bestDist == 999999) {
+            bestDist = 1000;
+        }
+
+        total += bestDist;
+    }
+
+    return total;
 }
 
 // equals: compara si dos estados tienen el mismo tablero.

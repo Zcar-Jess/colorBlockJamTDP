@@ -86,13 +86,32 @@ void Board::setWall(int row, int col) {
     grid[row][col].setAsWall();
 }
 
-void Board::addExit(const Exit& exit) {
-    exits[numExits] = exit;
-    // Marcar la celda de la salida en la grilla
-    // La salida ocupa 'li' celdas segun su orientacion
-    // Por ahora marcamos la celda origen
-    grid[exit.x][exit.y].setAsExit(numExits);
+void Board::addExit(const Exit& e) {
+
+    exits[numExits] = e;
+
+    int idx = numExits;
+
     numExits++;
+
+    // marcar en la grilla
+
+    if (e.orientation == 'H') {
+
+        for (int k = 0; k < e.li; k++) {
+
+            grid[e.x][e.y + k]
+                .setAsExit(idx);
+        }
+
+    } else {
+
+        for (int k = 0; k < e.li; k++) {
+
+            grid[e.x + k][e.y]
+                .setAsExit(idx);
+        }
+    }
 }
 
 void Board::addGate(const Gate& gate) {
@@ -326,8 +345,9 @@ void Board::display(int currentStep) const {
                 }
                 std::cout << c;
             } else if (cell.isGate()) {
-                // Mostrar color actual de la compuerta
                 std::cout << (char)gates[cell.refIndex].getColorAt(currentStep);
+            } else if (cell.isExit()) {
+                std::cout << exits[cell.refIndex].color;
             } else {
                 std::cout << cell.toChar();
             }
