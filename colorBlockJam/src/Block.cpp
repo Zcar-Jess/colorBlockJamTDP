@@ -126,7 +126,7 @@ void Block::print() const {
     for (int r = 0; r < height; r++) {
         std::cout << "  ";
         for (int c = 0; c < width; c++) {
-            std::cout << (geometry[r * width + c] ? '#' : '.');
+            std::cout << (geometry[r * width + c] ? color : '.');
         }
         std::cout << "\n";
     }

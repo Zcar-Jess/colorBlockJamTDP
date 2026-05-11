@@ -3,14 +3,13 @@
 #include <cassert>
 
 // testBlock.cpp  — prueba unitaria de la clase Block
-// Analogia: igual que testState.cpp en el ejemplo de envases,
 // aqui verificamos que Block se construye, copia y compara bien.
 
 void testConstructorYGetters() {
     std::cout << "[TEST] Constructor y getters...\n";
 
-    // Bloque 2x2 totalmente relleno (igual al ejemplo del PDF)
-    bool geom[] = {true, true, true, true};
+    // Bloque 2x2 totalmente relleno
+    bool geom[] = {1, 1, 1, 1};
     Block b(1, 'a', 2, 2, 4, 4, 0, geom);
 
     assert(b.getId()        == 1);
@@ -42,9 +41,9 @@ void testGeometriaIrregular() {
     //  # .
     //  # #
     bool geom[] = {
-        true,  false,
-        true,  false,
-        true,  true
+        1,  0,
+        1,  0,
+        1,  1
     };
     Block b(2, 'b', 2, 3, 0, 0, 0, geom);
 

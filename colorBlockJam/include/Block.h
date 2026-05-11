@@ -6,7 +6,7 @@
 // que tiene estado (posicion, color) y puede cambiar con operaciones.
 
 class Block {
-private:
+public:
     int id;         // Identificador unico del bloque
     char color;     // Color del bloque (letra minuscula, ej: 'a', 'b')
     int width;      // Ancho del bloque (columnas que ocupa su bounding box)
@@ -15,8 +15,7 @@ private:
     int y;          // Columna de la esquina (0,0) del bloque en el tablero
     int colorLock;  // 0=libre, 1-9=bloqueado hasta que salgan N salidas
     bool* geometry; // Arreglo booleano de width*height (true=celda del bloque)
-
-public:
+    
     // Constructor principal
     Block(int id, char color, int width, int height,
           int x, int y, int colorLock, const bool* geometry);
