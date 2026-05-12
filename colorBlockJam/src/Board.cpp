@@ -121,6 +121,13 @@ void Board::addGate(const Gate& gate) {
 }
 
 void Board::addBlock(Block* block) {
+    // Validar que el bloque esta dentro del tablero
+    if (block->x < 0 || block->x + block->height > height ||
+        block->y < 0 || block->y + block->width  > width) {
+        // Bloque fuera de rango: ignorar silenciosamente
+        delete block;
+        return;
+    }
     blocks[numBlocks++] = block;
     placeBlock(block);
 }
@@ -278,31 +285,45 @@ bool Board::canExit(int blockId, int currentStep) const {
     for (int e = 0; e < numExits; e++) {
         Exit& ex = exits[e];
 
-        // Verificar color
+        // 1. Color debe coincidir
         if (ex.color != b->color) continue;
 
-        // Verificar tamanio segun orientacion
-        bool fits = false;
-        if (ex.orientation == 'H') {
-            fits = ex.canFit(b->width, currentStep);
-        } else {
-            fits = ex.canFit(b->height, currentStep);
-        }
-        if (!fits) continue;
+        int L = ex.getLengthAt(currentStep);
 
-        // Verificar adyacencia: el bloque debe estar justo al lado de la salida
-        // Salida en borde superior (x == 0)
-        if (ex.x == 0 && b->x == 1) return true;
-        // Salida en borde inferior (x == height-1)
-        if (ex.x == height - 1 && b->x + b->height == height - 1) return true;
-        // Salida en borde izquierdo (y == 0)
-        if (ex.y == 0 && b->y == 1) return true;
-        // Salida en borde derecho (y == width-1)
-        if (ex.y == width - 1 && b->y + b->width == width - 1) return true;
+        // 2. Salida VERTICAL: ocupa filas ex.x..ex.x+L-1 en columna ex.y
+        if (ex.orientation == 'V') {
+
+            // El bloque debe caber en altura
+            if (!ex.canFit(b->height, currentStep)) continue;
+
+            // El bloque debe estar alineado dentro del rango de filas de la salida
+            if (b->x < ex.x || b->x + b->height > ex.x + L) continue;
+
+            // Borde izquierdo: bloque adyacente a columna 0
+            if (ex.y == 0 && b->y == 1) return true;
+
+            // Borde derecho: bloque adyacente a columna width-1
+            if (ex.y == width - 1 && b->y + b->width == width - 1) return true;
+        }
+
+        // 3. Salida HORIZONTAL: ocupa columnas ex.y..ex.y+L-1 en fila ex.x
+        else if (ex.orientation == 'H') {
+
+            // El bloque debe caber en ancho
+            if (!ex.canFit(b->width, currentStep)) continue;
+
+            // El bloque debe estar alineado dentro del rango de columnas de la salida
+            if (b->y < ex.y || b->y + b->width > ex.y + L) continue;
+
+            // Borde superior: bloque adyacente a fila 0
+            if (ex.x == 0 && b->x == 1) return true;
+
+            // Borde inferior: bloque adyacente a fila height-1
+            if (ex.x == height - 1 && b->x + b->height == height - 1) return true;
+        }
     }
     return false;
 }
-
 // removeBlock: elimina el bloque del tablero (salio).
 // Limpia sus celdas y lo quita del arreglo.
 void Board::removeBlock(int blockId) {

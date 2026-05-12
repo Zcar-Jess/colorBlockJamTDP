@@ -36,39 +36,23 @@ int GameState::computeHeuristic() const {
 
     for (int i = 0; i < board->numBlocks; i++) {
 
-        Block* blk = board->blocks[i];
-
-        int bestDist = 999999;
+        Block* blk     = board->blocks[i];
+        int    bestDist = 999999;
 
         for (int j = 0; j < board->numExits; j++) {
 
             Exit& ex = board->exits[j];
 
-            // solo salidas del mismo color
-            if (ex.color != blk->color) {
-                continue;
-            }
+            if (ex.color != blk->color) continue;
 
-            int dist = 0;
+            int dx = blk->x - ex.x;
+            int dy = blk->y - ex.y;
+            int dist = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
 
-            // distancia Manhattan desde esquina superior izquierda
-            dist += (blk->x > ex.y)
-                    ? (blk->x - ex.y)
-                    : (ex.y - blk->x);
-
-            dist += (blk->y > ex.x)
-                    ? (blk->y - ex.x)
-                    : (ex.x - blk->y);
-
-            if (dist < bestDist) {
-                bestDist = dist;
-            }
+            if (dist < bestDist) bestDist = dist;
         }
 
-        // si no existe salida compatible
-        if (bestDist == 999999) {
-            bestDist = 1000;
-        }
+        if (bestDist == 999999) bestDist = 1000;
 
         total += bestDist;
     }

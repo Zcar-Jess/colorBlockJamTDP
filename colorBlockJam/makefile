@@ -18,7 +18,8 @@ OBJS_BASE = \
 # =======================================================
 
 OBJS_PARSER = \
-	$(BUILD_DIR)/BoardParser.o
+	$(BUILD_DIR)/BoardParser.o \
+	$(BUILD_DIR)/MoveSequence.o
 
 # =======================================================
 # MOVIMIENTOS
@@ -122,17 +123,20 @@ $(BUILD_DIR)/Board.o: src/Board.cpp \
 	include/Block.h \
 	include/Exit.h \
 	include/Gate.h | $(BUILD_DIR)
-
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # =======================================================
-# PARSER
+# PARSER + MOVESEQUENCE
 # =======================================================
 
 $(BUILD_DIR)/BoardParser.o: src/BoardParser.cpp \
 	include/BoardParser.h \
 	include/Board.h | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/MoveSequence.o: src/MoveSequence.cpp \
+	include/MoveSequence.h \
+	include/Board.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # =======================================================
@@ -162,19 +166,16 @@ $(BUILD_DIR)/GameState.o: src/GameState.cpp \
 	include/GameState.h \
 	include/Board.h \
 	include/Operation.h | $(BUILD_DIR)
-
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/Heap.o: src/Heap.cpp \
 	include/Heap.h \
 	include/GameState.h | $(BUILD_DIR)
-
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/ClosedSet.o: src/ClosedSet.cpp \
 	include/ClosedSet.h \
 	include/GameState.h | $(BUILD_DIR)
-
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/NeighborGenerator.o: src/NeighborGenerator.cpp \
@@ -184,7 +185,6 @@ $(BUILD_DIR)/NeighborGenerator.o: src/NeighborGenerator.cpp \
 	include/MoveDown.h \
 	include/MoveLeft.h \
 	include/MoveRight.h | $(BUILD_DIR)
-
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/Solver.o: src/Solver.cpp \
@@ -192,14 +192,16 @@ $(BUILD_DIR)/Solver.o: src/Solver.cpp \
 	include/Heap.h \
 	include/ClosedSet.h \
 	include/NeighborGenerator.h | $(BUILD_DIR)
-
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # =======================================================
 # MAIN
 # =======================================================
 
-$(BUILD_DIR)/main.o: src/main.cpp | $(BUILD_DIR)
+$(BUILD_DIR)/main.o: src/main.cpp \
+	include/BoardParser.h \
+	include/Solver.h \
+	include/MoveSequence.h | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(MAIN_EXEC): \
@@ -208,11 +210,10 @@ $(MAIN_EXEC): \
 	$(OBJS_ASTAR) \
 	$(OBJS_MOVES) \
 	$(OBJS_BASE)
-
 	$(CXX) $^ -o $@
 
 # =======================================================
-# TESTS
+# TESTS OBJETOS
 # =======================================================
 
 $(BUILD_DIR)/testBlock.o: test_class/testBlock.cpp | $(BUILD_DIR)
@@ -239,9 +240,7 @@ $(BUILD_DIR)/testGameState.o: test_class/testGameState.cpp | $(BUILD_DIR)
 $(BUILD_DIR)/testSolver.o: test_class/testSolver.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/testBoardParser.o: \
-	test_class/testBoardParser.cpp | $(BUILD_DIR)
-
+$(BUILD_DIR)/testBoardParser.o: test_class/testBoardParser.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # =======================================================
@@ -272,7 +271,6 @@ $(TEST_GAMESTATE): \
 	$(BUILD_DIR)/Heap.o \
 	$(OBJS_MOVES) \
 	$(OBJS_BASE)
-
 	$(CXX) $^ -o $@
 
 $(TEST_SOLVER): \
@@ -280,7 +278,6 @@ $(TEST_SOLVER): \
 	$(OBJS_ASTAR) \
 	$(OBJS_MOVES) \
 	$(OBJS_BASE)
-
 	$(CXX) $^ -o $@
 
 $(TEST_BOARDPARSER): \
@@ -289,7 +286,6 @@ $(TEST_BOARDPARSER): \
 	$(OBJS_ASTAR) \
 	$(OBJS_MOVES) \
 	$(OBJS_BASE)
-
 	$(CXX) $^ -o $@
 
 # =======================================================
@@ -329,6 +325,30 @@ testBoardParser: $(TEST_BOARDPARSER)
 
 main: $(MAIN_EXEC)
 	./$(MAIN_EXEC)
+
+# =======================================================
+# RUN TODOS LOS TESTS
+# =======================================================
+
+run: \
+	$(TEST_BLOCK) \
+	$(TEST_EXIT) \
+	$(TEST_GATE) \
+	$(TEST_CELL) \
+	$(TEST_BOARD) \
+	$(TEST_OPERATION) \
+	$(TEST_GAMESTATE) \
+	$(TEST_SOLVER) \
+	$(TEST_BOARDPARSER)
+	@echo "\n=== testBlock ===" && ./$(TEST_BLOCK)
+	@echo "\n=== testExit ===" && ./$(TEST_EXIT)
+	@echo "\n=== testGate ===" && ./$(TEST_GATE)
+	@echo "\n=== testCell ===" && ./$(TEST_CELL)
+	@echo "\n=== testBoard ===" && ./$(TEST_BOARD)
+	@echo "\n=== testOperation ===" && ./$(TEST_OPERATION)
+	@echo "\n=== testGameState ===" && ./$(TEST_GAMESTATE)
+	@echo "\n=== testSolver ===" && ./$(TEST_SOLVER)
+	@echo "\n=== testBoardParser ===" && ./$(TEST_BOARDPARSER)
 
 # =======================================================
 # VALGRIND

@@ -1,69 +1,79 @@
 #include "Solver.h"
-
 #include "Heap.h"
 #include "ClosedSet.h"
 #include "NeighborGenerator.h"
-
 #include <iostream>
 #include <chrono>
 
 GameState* Solver::solve(Board* initialBoard) {
 
-    Heap open(128);
-
-    ClosedSet closed(128);
+    Heap*      open   = new Heap(512);
+    ClosedSet* closed = new ClosedSet(1024);
 
     GameState* start = new GameState(
-        new Board(*initialBoard),
-        0,
-        0,
-        nullptr,
-        nullptr
+        new Board(*initialBoard), 0, 0, nullptr, nullptr
     );
 
-    open.push(start);
+    open->push(start);
 
-    while (!open.isEmpty()) {
+    GameState* solution = nullptr;
 
-        GameState* current = open.pop();
+    while (!open->isEmpty()) {
 
-        // evitar revisitas
-        if (closed.contains(current)) {
+        GameState* current = open->pop();
+
+        // Estado ya visitado: liberar y saltar
+        if (closed->contains(current)) {
+            delete current;
             continue;
         }
 
-        closed.add(current);
+        // Agregar al ClosedSet (toma ownership)
+        closed->add(current);
 
-        // objetivo alcanzado
+        // Objetivo alcanzado
         if (current->board->isGoal()) {
-            return current;
+            solution = current;
+            break;
         }
 
-        // limite de pasos
-        if (current->currentStep >
-            current->board->stepLimit) {
+        // Limite de pasos
+        if (current->currentStep > current->board->stepLimit) {
             continue;
         }
 
-        // generar vecinos
+        // Generar vecinos
         int count = 0;
-
         GameState** neighbors =
             NeighborGenerator::generate(current, count);
 
         for (int i = 0; i < count; i++) {
-
-            GameState* next = neighbors[i];
-
-            if (!closed.contains(next)) {
-                open.push(next);
+            if (!closed->contains(neighbors[i])) {
+                open->push(neighbors[i]);
+            } else {
+                delete neighbors[i];
             }
         }
 
         delete[] neighbors;
     }
 
-    return nullptr;
+    // Liberar estados restantes en el Heap (no visitados)
+    while (!open->isEmpty()) {
+        GameState* gs = open->pop();
+        if (!closed->contains(gs)) {
+            delete gs;
+        }
+    }
+
+    // ClosedSet contiene todos los estados visitados incluyendo
+    // el camino solucion. NO liberar el ClosedSet aqui para que
+    // los punteros parent del camino solucion sigan validos.
+    // Se liberan en printSolution despues de usar la solucion.
+    delete open;
+    // closed se libera desde main despues de usar la solucion
+
+    return solution;
 }
 
 void Solver::printSolution(GameState* goal) {
@@ -73,65 +83,66 @@ void Solver::printSolution(GameState* goal) {
         return;
     }
 
-    GameState* path[1024];
-
+    // Reconstruir camino usando arreglo en heap (no stack)
+    int capacity = 1024;
+    GameState** path = new GameState*[capacity];
     int size = 0;
 
     GameState* cur = goal;
-
     while (cur != nullptr) {
+        if (size >= capacity) {
+            capacity *= 2;
+            GameState** newPath = new GameState*[capacity];
+            for (int i = 0; i < size; i++) newPath[i] = path[i];
+            delete[] path;
+            path = newPath;
+        }
         path[size++] = cur;
         cur = cur->parent;
     }
 
     std::cout << "===== VISUALIZACION =====\n";
+    path[size - 1]->board->display(path[size - 1]->currentStep);
 
-    // tablero inicial
-    path[size - 1]->board->display(
-        path[size - 1]->currentStep
-    );
-
-    // desde el segundo estado en adelante
     for (int i = size - 2; i >= 0; i--) {
-
-        // imprimir movimiento
         if (path[i]->lastOp) {
             path[i]->lastOp->print();
             std::cout << "\n";
         }
-
-        // imprimir tablero resultante
-        path[i]->board->display(
-            path[i]->currentStep
-        );
-
+        path[i]->board->display(path[i]->currentStep);
         std::cout << "-------------------\n";
     }
+
+    delete[] path;
 }
 
 void Solver::printOperations(GameState* goal) {
 
-    if (goal == nullptr) {
-        return;
-    }
+    if (!goal) return;
 
-    GameState* path[1024];
-
+    int capacity = 1024;
+    GameState** path = new GameState*[capacity];
     int size = 0;
 
     GameState* cur = goal;
-
     while (cur != nullptr) {
+        if (size >= capacity) {
+            capacity *= 2;
+            GameState** newPath = new GameState*[capacity];
+            for (int i = 0; i < size; i++) newPath[i] = path[i];
+            delete[] path;
+            path = newPath;
+        }
         path[size++] = cur;
         cur = cur->parent;
     }
 
     for (int i = size - 2; i >= 0; i--) {
-
         if (path[i]->lastOp) {
             path[i]->lastOp->print();
         }
     }
-
     std::cout << "\n";
+
+    delete[] path;
 }
