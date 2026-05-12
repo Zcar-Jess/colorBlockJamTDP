@@ -8,7 +8,7 @@
 GameState* Solver::solve(Board* initialBoard) {
 
     Heap*      open   = new Heap(512);
-    ClosedSet* closed = new ClosedSet(1024);
+    ClosedSet* closed = new ClosedSet(4096);
 
     GameState* start = new GameState(
         new Board(*initialBoard), 0, 0, nullptr, nullptr

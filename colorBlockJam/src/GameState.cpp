@@ -45,6 +45,7 @@ int GameState::computeHeuristic() const {
 
             if (ex.color != blk->color) continue;
 
+            // CORREGIDO: x con x, y con y (antes estaban invertidos)
             int dx = blk->x - ex.x;
             int dy = blk->y - ex.y;
             int dist = (dx < 0 ? -dx : dx) + (dy < 0 ? -dy : dy);
