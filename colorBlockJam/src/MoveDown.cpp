@@ -13,9 +13,6 @@ bool MoveDown::isAppl(Board* b, int currentStep) const {
 Board* MoveDown::apply(Board* b, int currentStep) const {
     Board* newBoard = new Board(*b);
     newBoard->moveBlock(blockId, 'D', steps, currentStep);
-    if (newBoard->canExit(blockId, currentStep)) {
-        newBoard->removeBlock(blockId);
-    }
     return newBoard;
 }
 

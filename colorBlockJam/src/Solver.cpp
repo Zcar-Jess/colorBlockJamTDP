@@ -69,7 +69,7 @@ GameState* Solver::solve(Board* initialBoard) {
 void Solver::printSolution(GameState* goal) {
 
     if (!goal) {
-        std::cout << "Juego sin solucion\n";
+        std::cout << "No hay solucion\n";
         return;
     }
 
@@ -84,13 +84,47 @@ void Solver::printSolution(GameState* goal) {
         cur = cur->parent;
     }
 
-    std::cout << "Solucion encontrada.\n";
+    std::cout << "===== VISUALIZACION =====\n";
 
-    std::cout << "Pasos:\n";
+    // tablero inicial
+    path[size - 1]->board->display(
+        path[size - 1]->currentStep
+    );
 
-    // -------------------------------------------------
-    // imprimir secuencia compacta
-    // -------------------------------------------------
+    // desde el segundo estado en adelante
+    for (int i = size - 2; i >= 0; i--) {
+
+        // imprimir movimiento
+        if (path[i]->lastOp) {
+            path[i]->lastOp->print();
+            std::cout << "\n";
+        }
+
+        // imprimir tablero resultante
+        path[i]->board->display(
+            path[i]->currentStep
+        );
+
+        std::cout << "-------------------\n";
+    }
+}
+
+void Solver::printOperations(GameState* goal) {
+
+    if (goal == nullptr) {
+        return;
+    }
+
+    GameState* path[1024];
+
+    int size = 0;
+
+    GameState* cur = goal;
+
+    while (cur != nullptr) {
+        path[size++] = cur;
+        cur = cur->parent;
+    }
 
     for (int i = size - 2; i >= 0; i--) {
 
@@ -100,24 +134,4 @@ void Solver::printSolution(GameState* goal) {
     }
 
     std::cout << "\n";
-
-    // -------------------------------------------------
-    // mostrar evolucion visual del tablero
-    // -------------------------------------------------
-
-    std::cout << "\n===== VISUALIZACION =====\n";
-
-    for (int i = size - 1; i >= 0; i--) {
-
-        path[i]->board->display(
-            path[i]->currentStep
-        );
-
-        if (path[i]->lastOp) {
-            path[i]->lastOp->print();
-            std::cout << "\n";
-        }
-
-        std::cout << "-------------------\n";
-    }
 }

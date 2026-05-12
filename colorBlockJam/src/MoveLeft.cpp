@@ -13,9 +13,6 @@ bool MoveLeft::isAppl(Board* b, int currentStep) const {
 Board* MoveLeft::apply(Board* b, int currentStep) const {
     Board* newBoard = new Board(*b);
     newBoard->moveBlock(blockId, 'L', steps, currentStep);
-    if (newBoard->canExit(blockId, currentStep)) {
-        newBoard->removeBlock(blockId);
-    }
     return newBoard;
 }
 

@@ -9,6 +9,8 @@ public:
     static GameState* solve(Board* initialBoard);
 
     static void printSolution(GameState* goal);
+
+    static void printOperations(GameState* goal);
 };
 
 #endif

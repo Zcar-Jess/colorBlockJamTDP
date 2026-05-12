@@ -16,12 +16,14 @@ void cargarArchivo() {
     cout << "Ingrese archivo: ";
     cin >> path;
 
+    path = "data/test/" + path;
+
     if (currentBoard != nullptr) {
         delete currentBoard;
         currentBoard = nullptr;
     }
 
-    currentBoard = BoardParser::parse(path.c_str());
+    currentBoard = BoardParser::loadFromFile(path.c_str());
 
     if (currentBoard == nullptr) {
         cout << "Error cargando archivo\n";

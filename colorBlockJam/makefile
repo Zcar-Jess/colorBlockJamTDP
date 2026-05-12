@@ -43,6 +43,13 @@ OBJS_ASTAR = \
 	$(BUILD_DIR)/Solver.o
 
 # =======================================================
+# MAIN
+# =======================================================
+
+MAIN_EXEC = $(BUILD_DIR)/main
+MAIN_OBJ  = $(BUILD_DIR)/main.o
+
+# =======================================================
 # EJECUTABLES TEST
 # =======================================================
 
@@ -75,6 +82,7 @@ OBJ_TEST_BOARDPARSER  = $(BUILD_DIR)/testBoardParser.o
 # =======================================================
 
 all: \
+	$(MAIN_EXEC) \
 	$(TEST_BLOCK) \
 	$(TEST_EXIT) \
 	$(TEST_GATE) \
@@ -188,6 +196,22 @@ $(BUILD_DIR)/Solver.o: src/Solver.cpp \
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # =======================================================
+# MAIN
+# =======================================================
+
+$(BUILD_DIR)/main.o: src/main.cpp | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(MAIN_EXEC): \
+	$(MAIN_OBJ) \
+	$(OBJS_PARSER) \
+	$(OBJS_ASTAR) \
+	$(OBJS_MOVES) \
+	$(OBJS_BASE)
+
+	$(CXX) $^ -o $@
+
+# =======================================================
 # TESTS
 # =======================================================
 
@@ -215,17 +239,13 @@ $(BUILD_DIR)/testGameState.o: test_class/testGameState.cpp | $(BUILD_DIR)
 $(BUILD_DIR)/testSolver.o: test_class/testSolver.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# =======================================================
-# TEST PARSER
-# =======================================================
-
 $(BUILD_DIR)/testBoardParser.o: \
 	test_class/testBoardParser.cpp | $(BUILD_DIR)
 
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 # =======================================================
-# LINKEO
+# LINKEO TESTS
 # =======================================================
 
 $(TEST_BLOCK): $(OBJ_TEST_BLOCK) $(BUILD_DIR)/Block.o
@@ -262,10 +282,6 @@ $(TEST_SOLVER): \
 	$(OBJS_BASE)
 
 	$(CXX) $^ -o $@
-
-# =======================================================
-# TEST BOARD PARSER
-# =======================================================
 
 $(TEST_BOARDPARSER): \
 	$(OBJ_TEST_BOARDPARSER) \
@@ -308,44 +324,18 @@ testBoardParser: $(TEST_BOARDPARSER)
 	./$(TEST_BOARDPARSER)
 
 # =======================================================
-# RUN ALL
+# MAIN
 # =======================================================
 
-run: all
-
-	@echo "\n=== testBlock ==="
-	./$(TEST_BLOCK)
-
-	@echo "\n=== testExit ==="
-	./$(TEST_EXIT)
-
-	@echo "\n=== testGate ==="
-	./$(TEST_GATE)
-
-	@echo "\n=== testCell ==="
-	./$(TEST_CELL)
-
-	@echo "\n=== testBoard ==="
-	./$(TEST_BOARD)
-
-	@echo "\n=== testOperation ==="
-	./$(TEST_OPERATION)
-
-	@echo "\n=== testGameState ==="
-	./$(TEST_GAMESTATE)
-
-	@echo "\n=== testSolver ==="
-	./$(TEST_SOLVER)
-
-	@echo "\n=== testBoardParser ==="
-	./$(TEST_BOARDPARSER)
+main: $(MAIN_EXEC)
+	./$(MAIN_EXEC)
 
 # =======================================================
 # VALGRIND
 # =======================================================
 
-valgrind: $(TEST_BOARDPARSER)
-	valgrind --leak-check=full ./$(TEST_BOARDPARSER)
+valgrind: $(MAIN_EXEC)
+	valgrind --leak-check=full ./$(MAIN_EXEC)
 
 # =======================================================
 # CLEAN

@@ -14,11 +14,6 @@ Board* MoveUp::apply(Board* b, int currentStep) const {
     // Crear copia del tablero (A* no modifica el estado original)
     Board* newBoard = new Board(*b);
     newBoard->moveBlock(blockId, 'U', steps, currentStep);
-
-    // Si el bloque puede salir despues de moverse, sacarlo
-    if (newBoard->canExit(blockId, currentStep)) {
-        newBoard->removeBlock(blockId);
-    }
     return newBoard;
 }
 

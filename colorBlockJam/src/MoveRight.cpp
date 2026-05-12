@@ -13,9 +13,6 @@ bool MoveRight::isAppl(Board* b, int currentStep) const {
 Board* MoveRight::apply(Board* b, int currentStep) const {
     Board* newBoard = new Board(*b);
     newBoard->moveBlock(blockId, 'R', steps, currentStep);
-    if (newBoard->canExit(blockId, currentStep)) {
-        newBoard->removeBlock(blockId);
-    }
     return newBoard;
 }
 
